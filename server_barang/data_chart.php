@@ -1,22 +1,23 @@
 <?php
 
-$connection_link = new mysqli("localhost", "root", "","db_barang"); 
-  
-if ($connection_link === false) { 
-    die("ERROR: Not connected. ".$connection_link->connect_error); 
-} 
-$sql_query  =  "insert tb_chart select * from tb_barang"; 
-$sql_query  =  "update tb_chart SET total_harga=(SELECT jumlah*harga FROM tb_barang WHERE tb_chart.id_barang = tb_barng)"; 
-if ($connection_link->query($sql_query) === true) 
-{ 
-echo "Data Copied Successfully."; 
-} 
-else
-{ 
-echo "ERROR: Could not able to proceed $sql_query. "
-    .$connection_link->error; 
-} 
-?>
+include 'koneksi.php';
 
-UPDATE table1 
-   SET price=(SELECT price FROM table2 WHERE table1.id=table2.id);
+$id_barang= $_POST['id_barang'];
+$harga_barang = $connect->query("SELECT harga from tb_barang WHERE id_barang=$id_barang")->fetch_assoc();
+$jumlah_barang= $connect->query("SELECT jumlah from tb_barang WHERE id_barang=$id_barang")->fetch_assoc();
+$total = $harga_barang['harga'] *$jumlah_barang['jumlah'];
+
+$sql = "INSERT INTO tb_chart(id_barang,jumlah,total_harga) VALUES('$id_barang','$jumlah_barang[jumlah]','$total')";
+$isSuccess = $connect = $connect->query($sql);
+
+if($isSuccess){
+    $res['is_success']= true;
+    $res['message']= 'Add Data Success';
+
+}else{
+    $res['is_success']= false;
+    $res['message']= 'Add data failed';
+
+}
+echo json_encode($res);
+?>
